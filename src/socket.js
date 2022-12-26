@@ -8,6 +8,7 @@ module.exports = (httpServer) => {
     }
   });
   io.on('connection', client => {
+    client.emit('connected', 'You are connected!');
     client.on('send_message', data => {
       const room = data.room;
       if (!room) return
@@ -16,6 +17,7 @@ module.exports = (httpServer) => {
     });
 
     client.on('join', async data => {
+      console.log(data)
       const room = data.room;
       const peer_id = data.peer_id;
       if (peer_id && room) {
@@ -25,7 +27,8 @@ module.exports = (httpServer) => {
       client.join(room);
       client.to(room).emit('joined', data_rooms[room]);
       client.on('disconnect', () => {
-        data_rooms[room] = data_rooms[room].filter(item => item !== peer_id)
+        console.log(data_rooms)
+        data_rooms[room] = data_rooms[room]?.filter(item => item !== peer_id)
         client.to(room).emit('left', peer_id);
       });
     });
